@@ -1,0 +1,99 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Args;
+using Telegram.Bot.Types.ReplyMarkups;
+using FastReport.Cloud;
+using System.Net.Http;
+using System.Reflection;
+using System.Net.Http.Headers;
+using System.Net;
+using com.sun.swing.@internal.plaf.basic.resources;
+using FastReport.Cloud.ReportProcessor;
+using FastReport.Cloud.Management;
+using System.IO;
+
+
+namespace MartinFierroBot
+{
+    
+        public class Program
+        {
+            private static string token { get; set; } = "1780772860:AAEjAkWT7DGjn40Ft9FSHGrYd98J-Nfrbnw";
+            private static TelegramBotClient client;
+        static void Main(string[] args)
+            {
+
+                client = new TelegramBotClient(token);
+                client.StartReceiving();
+                client.OnMessage += OnMessageHandler;
+                Console.ReadLine();
+                client.StartReceiving();
+            }
+
+            private static async void OnMessageHandler(object sender, MessageEventArgs e)
+            {
+                var msg = e.Message;
+                if (msg.Text != null)
+                {
+                    Console.WriteLine($"Hi: { msg.Text}");
+                    //await client.SendTextMessageAsync(msg.Chat.Id, msg.Text, replyMarkup: GetButtons());
+                    switch (msg.Text)
+                    {
+                        case "/start":
+                            await client.SendTextMessageAsync(msg.Chat.Id, "Привет! FastReport Cloud - набор облачных служб, используемый для хранения, pазграничения доступа пользователей к облаку, построения отчётов и создания шаблонов и редактированием шаблонов.\n Для появления кнопок: /help.");
+                            break;
+                        case "/status":
+                        await client.SendTextMessageAsync(msg.Chat.Id, "Авторизация");
+                        // Assembly a = Assembly.Load("FastReport.Cloud.SDK.dll");
+                        
+                        
+                        
+                            HttpClient httpClient = new HttpClient();
+                            httpClient.DefaultRequestHeaders.Authorization = new FastReportCloudApiKeyHeader("Введите apikey");
+                            CreateApiKeyVM model = new CreateApiKeyVM()
+                            {
+                            Description = "Created by FastReport.Cloud.SDK",
+                            Expired = DateTime.Now.AddYears(1)
+                            };
+                            IApiKeysClient apiKeysClient = new ApiKeysClient(httpClient);
+                        await client.SendTextMessageAsync(msg.Chat.Id, "Авторизация завершена");
+
+                        // await apiKeysClient.CreateApiKeyAsync(model);
+                        string rootFolder= "C:\\Users\\komel\\source\\repos\\MartinFierroBot\\packages\\FastReport.Cloud.SDK.2021.1.12";
+                        break;
+
+                        case "/help":
+                            await client.SendTextMessageAsync(msg.Chat.Id, " FastReport Cloud - набор облачных служб, pазграничения доступа пользователей к облаку, построения отчётов и создания шаблонов и редактированием шаблонов.");
+                             var pic = await client.SendPhotoAsync(
+                               chatId: msg.Chat.Id,
+                                photo: "https://sun9-44.userapi.com/impg/HEaCscipfJFOk6n8-Y2MQw-vdGpYlOVjnlPVXA/XymA2zWZZKM.jpg?size=674x286&quality=96&sign=f547b944d74dba736752cc07f9255eb3&type=album",
+                                replyMarkup:GetButtons());
+                        await client.SendTextMessageAsync(msg.Chat.Id, "Больше о FastReport Cloud https://fastreport.cloud.");
+                        await client.SendTextMessageAsync(msg.Chat.Id, "Команда /status принимает на вход FRX или FPX файлы. Далее, через некоторое время после загрузки вы получите сформированный по одному из выбранных вами шаблонов PDF-файл. ");
+
+                        break;
+                    }
+
+                }
+            }
+
+        private static IReplyMarkup GetButtons()
+        {
+            return new ReplyKeyboardMarkup
+            {
+                Keyboard = new List<List<KeyboardButton>>
+                {
+                    new List<KeyboardButton>{new KeyboardButton{ Text = "/start" }, new KeyboardButton{Text= "/help" } },
+                    new List<KeyboardButton>{new KeyboardButton{ Text = "/status"} }
+                }
+            };
+        }
+    }
+
+
+}
+    
